@@ -2,8 +2,18 @@ const express = require('express');
 const router = express.Router();
 const db = require('./userDb.js');
 
+router.get('/:id/posts', (req, res) => {
+  db.getUserPosts(req.params.id)
+    .then(posts => {
+      res.status(200).json(posts)
+    })
+    .catch(err => {
+      res.status(404).json({ message: "The user with the specified ID does not exist." })
+    })
+})
+
 router.get('/', (req, res) => {
-  db.find()
+  db.get()
     .then(users => {
       res.status(200).json(users)
     })
@@ -13,22 +23,22 @@ router.get('/', (req, res) => {
 })
 
 router.post('/', (req, res) => {
-  const { text } = req.body
-  if (!text) {
-    res.status(400).json({ errorMessage: "Please provide text for the user." })
+  const { name } = req.body
+  if (!name) {
+    res.status(400).json({ errorMessage: "Please provide name for the user." })
   }
   else {
     const user = {
-      text: text
+      name: name
     }
     db.insert(user)
       .then(user => {
-        db.findById(user.id)
+        db.getById(user.id)
           .then(foundUser => {
             res.status(201).json(foundUser)
           })
           .catch(err => {
-            res.status(500).json({ error: 'created, but could not find the user??' })
+            res.status(500).json({ error: 'created, but could not get the user??' })
           })
       })
       .catch(err => {
@@ -40,7 +50,7 @@ router.post('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
   console.log('getting user', req.params.id)
-  db.findById(req.params.id)
+  db.getById(req.params.id)
     .then(user => {
       res.status(200).json(user)
     })
@@ -66,28 +76,28 @@ router.delete('/:id', (req, res) => {
 
 router.put('/:id', (req, res) => {
   const { id } = req.params
-  const { text } = req.body
-  if (!text) {
+  const { name } = req.body
+  if (!name) {
     res.status(400).json({ errorMessage: "Please provide title and contents for the user." })
   }
   else {
-    db.findById(id)
+    db.getById(id)
       .then(user => {
         if (user.length === 0) {
           res.status(404).json({ message: "The user with the specified ID does not exist." })
         }
         else {
           const userToUpdate = {
-            text: text
+            name: name
           }
           db.update(id, userToUpdate)
             .then(num => {
-              db.findById(id)
+              db.getById(id)
                 .then(founduser => {
                   res.status(201).json(founduser)
                 })
                 .catch(err => {
-                  res.status(500).json({ error: 'updated, but could not find the user??' })
+                  res.status(500).json({ error: 'updated, but could not get the user??' })
                 })
             })
             .catch(err => {
