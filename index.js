@@ -17,7 +17,9 @@ app.use(express.json());
 app.use(correctName);
 app.use('/posts', posts);
 app.use('/users', users);
-
+app.get('/', (req, res) => {
+  res.send("Hello, Jake");
+})
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => {
