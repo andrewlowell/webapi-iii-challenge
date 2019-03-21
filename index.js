@@ -1,4 +1,5 @@
-// code away!
+require('dotenv').config()
+
 const express = require('express');
 const posts = require('./posts/postsRouter.js');
 const users = require('./users/usersRouter.js');
@@ -17,6 +18,8 @@ app.use(correctName);
 app.use('/posts', posts);
 app.use('/users', users);
 
-app.listen(5555, () => {
-  console.log('Server running on port 5555.');
+
+const port = process.env.PORT || 4000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}.`);
 });
